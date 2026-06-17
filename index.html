@@ -802,10 +802,7 @@
     <div class="form-card">
       <h3>📋 Solicitar cotización</h3>
       <p class="form-card-sub">Sin spam · Sin datos compartidos · Respuesta real</p>
-      <form id="leadForm">
-        <input type="hidden" name="access_key" value="5cc7bb09-89e2-4406-92dc-9907545ee5df">
-        <input type="hidden" name="subject" value="Nueva cotización — cambiocupo.cl">
-        <input type="hidden" name="from_name" value="CambioCupo.cl">
+      <form id="leadForm" action="https://api.girodolares.cl/lead" method="POST">
         <div class="form-group">
           <label>Nombre completo</label>
           <input type="text" name="nombre" placeholder="Tu nombre" required>
@@ -938,7 +935,10 @@
     btn.textContent = 'Enviando...';
     btn.disabled = true;
     try {
-      const res = await fetch('https://api.web3forms.com/submit', { method: 'POST', body: new FormData(this) });
+      const f = this;
+      const g = n => { const el = f.querySelector('[name='+n+']'); return el ? el.value : ''; };
+      const banco = g('banco');
+      const res = await fetch('https://api.girodolares.cl/lead', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ nombre: g('nombre'), email: g('email'), telefono: g('telefono'), monto_usd: g('monto_usd'), sitio: 'cambiocupo.cl', canal: 'email', mensaje: banco ? ('Banco: '+banco) : '' }) });
       const json = await res.json();
       if (json.success) {
         this.style.display = 'none';
@@ -949,15 +949,7 @@
 </script>
 <script>
 function trackWA() {
-  fetch('https://api.web3forms.com/submit', {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({
-      access_key: '5cc7bb09-89e2-4406-92dc-9907545ee5df',
-      subject: 'Click WhatsApp - ' + window.location.href,
-      message: 'Click WhatsApp desde: ' + window.location.href
-    })
-  }).catch(function(){});
+  (window.dataLayer=window.dataLayer||[]).push({event:'whatsapp_click',wa_location:window.location.href});
 }
 </script>
 </body>
